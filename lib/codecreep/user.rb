@@ -1,6 +1,6 @@
 module Codecreep
   class User < ActiveRecord::Base
-    def create_user(response)
+    def self.create_user_from_json(response)
       user = User.find_or_create_by(name: response['login'])
       user.homepage = response['url']
       user.company = response['company']

@@ -15,18 +15,18 @@ module Codecreep
   class App
     def initialize
       @github = Github.new
-      @user = User.new
     end
 
     def get_user(username)
       response = @github.get_user(username)
-      user = ''
-      if response['message'].nil?
-        user = @user.create_user(response)
+      user = nil
+      if response.code == 200
+        user = User.create_user_from_json(response)
       else
-        user = "You have reached your API limit for Github. This occurred on 
+        puts "You have reached your API limit for Github. This occurred on 
                 the user: #{username}. This name and any usernames given 
                 afterward will not be included in the search."
+        exit
       end
       user
     end
@@ -34,32 +34,22 @@ module Codecreep
     def fetch(username_array)
       fetch_array = []
       username_array.each do |n|
-        response = get_user(n)
-        if response.instance_of?(User)
-          fetch_array << response
-        else
-          fetch_array << response
-          break
-        end
+        fetch_array << get_user(n)
       end
       fetch_array
     end
 
     def print_fetch_users(fetch_array)
       fetch_array.each do |u|
-        if u.instance_of?(User)
-          puts "Name: #{u.name}"
-          puts "Follower Count: #{u.follower_count}"
-          puts "Friend Count: #{u.following_count}"
-          puts "Repo Count: #{u.repo_count}"
-          puts "Company: #{u.company}"
-          puts "Homepage: #{u.homepage}"
-          puts
-          puts '-----------------------------------------'
-          puts
-        else
-          puts u
-        end
+        puts "Name: #{u.name}"
+        puts "Follower Count: #{u.follower_count}"
+        puts "Friend Count: #{u.following_count}"
+        puts "Repo Count: #{u.repo_count}"
+        puts "Company: #{u.company}"
+        puts "Homepage: #{u.homepage}"
+        puts
+        puts '-----------------------------------------'
+        puts
       end
     end
 
